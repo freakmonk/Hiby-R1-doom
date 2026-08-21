@@ -1,0 +1,263 @@
+#!/bin/sh
+
+get_rfkill_index() {
+    local name_pattern="$1"
+    local fallback="$2"
+    local index=""
+    for rf in /sys/class/rfkill/rfkill*; do
+        [ -f "$rf/name" ] || continue
+        rf_name=$(cat "$rf/name")
+        if echo "$rf_name" | grep -qi "$name_pattern"; then
+            index=$(basename "$rf" | sed 's/rfkill//')
+            echo "Found rfkill index: $index ($rf_name, pattern: $name_pattern)" >&2
+            break
+        fi
+    done
+    if [ -z "$index" ]; then
+        index="$fallback"
+        echo "WARNING: Cannot find rfkill with pattern '$name_pattern', fallback to rfkill$index" >&2
+    fi
+    echo "$index"
+}
+
+# The system bus is normally started by S30dbus before sys_server.
+if ! pidof dbus-daemon >/dev/null; then
+    rm /var/run/messagebus.pid -rf
+    mkdir -p /tmp/dbus
+    mkdir -p /var/lib/dbus
+    dbus-uuidgen > /var/lib/dbus/machine-id
+    dbus-daemon --config-file=/usr/share/dbus-1/system.conf
+fi
+
+rfkill_bt_index=$(get_rfkill_index "bluetooth" "0")
+
+echo 1 > /sys/class/rfkill/rfkill$rfkill_bt_index/state
+sleep 1 # if invoke this script in c with system(), must sleep for a while!!!!!
+
+# Delete the previous Bluetooth address storage file.
+if [ -f /usr/data/btmacaddr.txt ]; then
+    rm -f /usr/data/btmacaddr.txt
+fi
+
+bt_mac_file="/usr/data/bt_macaddr.txt"
+mac_prefix="4C:BC:98:B0"
+min_suffix_dec=10240
+max_suffix_dec=14336
+num_possible_values=$(( max_suffix_dec - min_suffix_dec + 1 ))
+
+if [ -f "$bt_mac_file" ]; then
+    bt_addr=$(cat "$bt_mac_file")
+else
+    if [ "$num_possible_values" -le 0 ]; then
+        random_offset=0
+    else
+        random_offset=$(awk -v n_val="$num_possible_values" 'BEGIN{srand(); print int(rand() * n_val)}')
+    fi
+    random_suffix_dec=$(( min_suffix_dec + random_offset ))
+    o5_val_dec=$(( random_suffix_dec / 256 ))
+    o6_val_dec=$(( random_suffix_dec % 256 ))
+    o5_hex=$(printf "%02X" "$o5_val_dec")
+    o6_hex=$(printf "%02X" "$o6_val_dec")
+
+    bt_addr="${mac_prefix}:${o5_hex}:${o6_hex}"
+    target_dir=$(dirname "$bt_mac_file")
+    mkdir -p "$target_dir"
+    echo "$bt_addr" > "$bt_mac_file"
+fi
+
+echo "BT_MACADDR $bt_addr"
+
+BCM_SDIO_BASE=/sys/devices/platform/md_ingenic,mmc.0/mmc_host/mmc0/mmc0:0001
+AIC_SDIO_BASE=/sys/devices/platform/md_ingenic,mmc.0/mmc_host/mmc0/mmc0:9c85
+chip_type=""
+firmware=""
+
+# Detect chip type via SDIO modalias
+for sdio_path in "$AIC_SDIO_BASE" "$BCM_SDIO_BASE"; do
+    [ -d "$sdio_path" ] || continue
+    sdio_name=$(basename "$sdio_path")
+    
+    for func in 1 2; do
+        MODALIAS_FILE="$sdio_path/$sdio_name:$func/modalias"
+        [ -f "$MODALIAS_FILE" ] || continue
+        
+        modalias=$(cat "$MODALIAS_FILE")
+        vendor_id=$(echo "$modalias" | sed -n 's/.*v\([0-9A-Fa-f]\{4\}\).*/\1/p' | tr '[:upper:]' '[:lower:]')
+        device_id=$(echo "$modalias" | sed -n 's/.*d\([0-9A-Fa-f]\{4\}\).*/\1/p' | tr '[:upper:]' '[:lower:]')
+        
+        [ -n "$vendor_id" ] && [ -n "$device_id" ] || continue
+        
+        if [ "$vendor_id" = "c8a1" ]; then
+            chip_type="aic8800"
+            echo "Detected AIC8800 chip via SDIO (vid=$vendor_id, did=$device_id)"
+            break 2
+        elif [ "$vendor_id" = "02d0" ]; then
+            case "$device_id" in
+		# AP6255 ---- BCM4345C5
+                a9bf|4345|0812)
+                    chip_type="bcm4345c5"
+                    firmware="BCM4345C5_003.006.006.0058.0135.hcd"
+                    break 2
+                    ;;
+	        # AP6212 / AW-NB372SM --- BCM4343A1
+                a9a6|0726|4343)
+                    CHIPVENDOR="$sdio_path/$sdio_name:2/chipvendor"
+                    if [ -f "$CHIPVENDOR" ]; then
+                        chipvendor=$(cat "$CHIPVENDOR")
+                        case "$chipvendor" in
+                            0x81)
+                                chip_type="bcm4343a1_aw"
+                                firmware="BCM4343A1_001.002.009.0122.0538.hcd"
+                                ;;
+                            *)
+                                chip_type="bcm4343a1"
+                                firmware="BCM4343A1_001.002.009.1010.1030.hcd"
+                                ;;
+                        esac
+                    else
+                        chip_type="bcm4343a1_aw"
+                        firmware="BCM4343A1_001.002.009.0122.0538.hcd"
+                    fi
+                    break 2
+                    ;;
+            esac
+        fi
+    done
+done
+
+# --- Fallback ---
+if [ -z "$chip_type" ]; then
+    echo "WARNING: Cannot detect chip, fallback to default"
+    chip_type="bcm4343a1_aw"
+    firmware="BCM4343A1_001.002.009.0122.0538.hcd"
+fi
+
+echo "Detected chip: $chip_type"
+echo "Selected firmware: $firmware"
+
+FIRMWARE_PATH="/lib/firmware/bt_bcm/$firmware"
+
+if [ "$chip_type" = "aic8800" ]; then
+    echo "Initializing AIC8800 Bluetooth..."
+    bt_test -s uart 115200 /dev/ttyS0 &
+    sleep 1
+    hciattach -s 115200 /dev/ttyS0 any 1500000 flow nosleep &
+    sleep 1
+    rfkill_hci_index=$(get_rfkill_index "hci0" "2")
+    echo 1 > /sys/class/rfkill/rfkill$rfkill_hci_index/state
+    sleep 1
+
+elif [ "$chip_type" = "bcm4345c5" ]; then
+    # AP6255 ---- BCM4345C5
+    brcm_patchram_plus \
+        --baudrate 3000000 \
+        --no2bytes \
+        --patchram "$FIRMWARE_PATH" \
+        /dev/ttyS0 \
+        --tosleep=200000 \
+        --bd_addr "$bt_addr"
+
+    if [ $? -ne 0 ]; then
+        echo "ERROR: brcm_patchram_plus failed"
+        echo 0 > /sys/class/rfkill/rfkill$rfkill_bt_index/state 2>/dev/null
+        exit 1
+    fi
+
+    sleep 0.5
+    stty -F /dev/ttyS0 3000000 crtscts
+    sleep 0.2
+
+    hciattach /dev/ttyS0 any 3000000 flow
+    sleep 1
+    hciconfig hci0 up
+    sleep 1
+
+else
+    # AP6212 / AW-NB372SM --- BCM4343A1
+    brcm_patchram_plus \
+        --enable_hci \
+        --baudrate 3000000 \
+        --no2bytes \
+        --patchram "$FIRMWARE_PATH" \
+        /dev/ttyS0 \
+        --tosleep=50000 \
+        --use_baudrate_for_download \
+        --enable_lpm \
+        --bd_addr "$bt_addr" &
+
+    sleep 5
+fi
+
+echo "Bluetooth init done"
+
+hciconfig hci0 up
+sleep 1
+
+# turn on bluetooth service
+# - E is enable experimental interface
+# - C is enable sdp service
+/usr/libexec/bluetooth/bluetoothd -E -C &
+
+hciconfig hci0 reset
+sleep 1
+
+# Bluetooth for simulating cars
+# hciconfig hci0 sspmode 0
+# echo "* 0000" > /tmp/pin.conf
+# bt-agent -c DisplayOnly -p /tmp/pin.conf &
+
+# normol mode
+echo "* 0000" > /usr/data/pin.conf
+chmod 600 /usr/data/pin.conf
+bt-agent -c NoInputNoOutput -p /usr/data/pin.conf &
+sleep 1
+
+#monitor listening the device status
+# bt-monitor &
+
+# launch bluealas server
+
+/usr/bin/bluealsa -p a2dp-source --a2dp-volume &
+
+ALSA_CONF_FILE="/usr/data/alsa.conf"
+# 创建默认alsa配置文件
+if [ ! -f "$ALSA_CONF_FILE" ]; then
+    # echo "File $ALSA_CONF_FILE not found. Creating it..."
+    cat <<EOF > "$ALSA_CONF_FILE"
+pcm.bt_alsa_sink {
+    type plug
+    slave {
+        pcm {
+            type bluealsa
+            device XX:XX:XX:XX:XX:XX
+            profile "a2dp"
+            codec "ldac"
+            ldac_eqmid "LDAC_ABR"
+            uat_eqmid "UAT_600"
+        }
+    }
+}
+EOF
+else
+    echo "File $ALSA_CONF_FILE already exists."
+fi
+
+sleep 1
+
+if [ -f /usr/resource/bt_name ]
+then
+bt-adapter --set "Powered" "On"
+bt_name=`cat /usr/resource/bt_name`
+bt-adapter --set "Alias" "$bt_name"
+
+# add hibylink serial port
+sleep 1
+sdptool add HIBYLINK_SP
+
+fi
+bt-adapter --set "Powered" "Off"
+# bt-media &
+
+#set the bluetooth init ok flag
+mkdir -p /tmp
+echo   > /tmp/bt_init_ok

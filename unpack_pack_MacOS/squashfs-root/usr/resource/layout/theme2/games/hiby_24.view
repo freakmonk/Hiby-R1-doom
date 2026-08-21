@@ -1,0 +1,18 @@
+{"viewgroup":{
+ "textview":{"name":"game24_back","text":"<","size":30,"color":"0xffffff","focus_color":"0xf0d17a","type":"static|center|middle","x":6,"y":5,"w":48,"h":48,"touch_x":0,"touch_y":0,"touch_w":82,"touch_h":58,"textview":true},
+ "textview":{"name":"game24_title","text":"24 POINTS","size":28,"color":"0xf0d17a","type":"static|center|middle","x":90,"y":5,"w":300,"h":48,"textview":true},
+ "textview":{"name":"game24_answer","text":"?","size":30,"color":"0xf0d17a","bg_color":"0x252a2c","focus_color":"0xb28a45","type":"static|center|middle","x":416,"y":5,"w":54,"h":48,"textview":true},
+ "textview":{"name":"game24_rule","text":"USE ALL FOUR NUMBERS ONCE","size":18,"color":"0xb8c2c7","type":"static|center|middle","x":20,"y":62,"w":440,"h":38,"textview":true},
+ "textview":{"name":"game24_num_0","text":"1","size":40,"color":"0xffffff","bg_color":"0x1d2123","type":"static|center|middle","x":20,"y":120,"w":100,"h":100,"textview":true},
+ "textview":{"name":"game24_num_1","text":"2","size":40,"color":"0xffffff","bg_color":"0x1d2123","type":"static|center|middle","x":133,"y":120,"w":100,"h":100,"textview":true},
+ "textview":{"name":"game24_num_2","text":"3","size":40,"color":"0xffffff","bg_color":"0x1d2123","type":"static|center|middle","x":246,"y":120,"w":100,"h":100,"textview":true},
+ "textview":{"name":"game24_num_3","text":"8","size":40,"color":"0xffffff","bg_color":"0x1d2123","type":"static|center|middle","x":359,"y":120,"w":100,"h":100,"textview":true},
+ "textview":{"name":"game24_op_add","text":"+","size":34,"color":"0xffffff","bg_color":"0x252a2c","type":"static|center|middle","x":20,"y":260,"w":100,"h":72,"textview":true},
+ "textview":{"name":"game24_op_sub","text":"-","size":34,"color":"0xffffff","bg_color":"0x252a2c","type":"static|center|middle","x":133,"y":260,"w":100,"h":72,"textview":true},
+ "textview":{"name":"game24_op_mul","text":"x","size":34,"color":"0xffffff","bg_color":"0x252a2c","type":"static|center|middle","x":246,"y":260,"w":100,"h":72,"textview":true},
+ "textview":{"name":"game24_op_div","text":"/","size":34,"color":"0xffffff","bg_color":"0x252a2c","type":"static|center|middle","x":359,"y":260,"w":100,"h":72,"textview":true},
+ "textview":{"name":"game24_status","text":"SELECT A NUMBER","size":24,"color":"0xffffff","type":"static|center|middle","x":20,"y":365,"w":440,"h":90,"textview":true},
+ "textview":{"name":"game24_reset","text":"RESET","size":22,"color":"0xffffff","bg_color":"0x394a50","type":"static|center|middle","x":20,"y":500,"w":210,"h":68,"textview":true},
+ "textview":{"name":"game24_new","text":"NEW PUZZLE","size":22,"color":"0xffffff","bg_color":"0x8a6b35","focus_color":"0xb28a45","type":"static|center|middle","x":250,"y":500,"w":210,"h":68,"textview":true},
+ "textview":{"name":"game24_help","text":"NUMBER -> OPERATOR -> NUMBER","size":18,"color":"0x7f8c91","type":"static|center|middle","x":20,"y":605,"w":440,"h":50,"textview":true},
+ "name":"vg_game24_hiby","type":"hgl_view","x":0,"y":0,"w":480,"h":750,"hglview_x":0,"hglview_y":50,"hglview_w":480,"hglview_h":750,"zorder":20,"color":"0x121617","viewgroup":true,"add_layout":true}}

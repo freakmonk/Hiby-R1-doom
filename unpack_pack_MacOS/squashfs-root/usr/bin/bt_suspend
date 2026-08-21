@@ -1,0 +1,35 @@
+#!/bin/sh
+
+get_rfkill_index() {
+    local name_pattern="$1"
+    local fallback="$2"
+    local index=""
+    for rf in /sys/class/rfkill/rfkill*; do
+        [ -f "$rf/name" ] || continue
+        rf_name=$(cat "$rf/name")
+        if echo "$rf_name" | grep -qi "$name_pattern"; then
+            index=$(basename "$rf" | sed 's/rfkill//')
+            break
+        fi
+    done
+    if [ -z "$index" ]; then
+        index="$fallback"
+    fi
+    echo "$index"
+}
+
+hciconfig hci0 down 2>/dev/null
+
+# killall bluetoothd > /dev/null
+# killall bluealsa > /dev/null
+# killall dbus-daemon > /dev/null
+# rm /var/run/messagebus.pid -rf
+
+killall brcm_patchram_plus >/dev/null 2>&1
+killall hciattach >/dev/null 2>&1
+killall bt_test >/dev/null 2>&1
+
+# bluetooth power off
+rfkill_bt_index=$(get_rfkill_index "bluetooth" "0")
+echo 0 > /sys/class/rfkill/rfkill$rfkill_bt_index/state
+sleep 1

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Kill any existing bluealsa process
+killall    bluealsa    &>/dev/null
+killall -9 bluealsa    &>/dev/null
+
+killall    bt-agent    &>/dev/null
+killall -9 bt-agent    &>/dev/null
+
+case "$1" in
+  a2dp-sink)
+    # echo "Starting bluealsa with A2DP sink profile..."
+    /usr/bin/bluealsa -p a2dp-sink --a2dp-volume &
+    # echo "Bluealsa sink started."
+    bt-agent -c NoInputNoOutput &
+    ;;
+  a2dp-source)
+    # echo "Starting bluealsa with A2DP source profile..."
+    /usr/bin/bluealsa -p a2dp-source --a2dp-volume &
+    # echo "Bluealsa source started."
+    bt-agent -c NoInputNoOutput -p /usr/data/pin.conf &
+    ;;
+  *)
+    echo "Usage: $0 {a2dp-sink|a2dp-source}"
+    exit 1
+    ;;
+esac
