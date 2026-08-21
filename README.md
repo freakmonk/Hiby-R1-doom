@@ -18,7 +18,7 @@ A functional port of **Doom** for the **HiBy R1** digital audio player. Features
 1. **Copy files to MicroSD card:**
    - Rename `r1_doom_mod.upt` to `r1.upt` and place it in the root of the SD card.
    - Copy [`sd_card/bidhata-menu.conf`](sd_card/bidhata-menu.conf) to the root of the SD card.
-   - Copy the [`sd_card/doom`](sd_card/doom) folder (containing `DOOM1.WAD`) to the root of the SD card.
+   - Copy the [`sd_card/doom`](sd_card/doom) folder (containing `DOOM1.WAD`,`doom`) to the root of the SD card.
 
    *MicroSD card file structure:*
    ```text
@@ -27,6 +27,7 @@ A functional port of **Doom** for the **HiBy R1** digital audio player. Features
    ├── bidhata-menu.conf
    └── doom/
        └── DOOM1.WAD
+       └── doom
    ```
 
 2. **Flash the device:**

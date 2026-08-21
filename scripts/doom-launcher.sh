@@ -4,11 +4,13 @@
 
 SD_MOUNT=/data/mnt/sd_0
 DOOM_DIR=$SD_MOUNT/doom
-LOG_FILE=/usr/data/doom.log
+
+# Log goes to SD card so user can read it after game exits
+LOG_FILE=$SD_MOUNT/doom/doom.log
 
 log() {
     echo "doom-launcher: $*" > /dev/console 2>/dev/null
-    echo "doom-launcher: $*" >> $LOG_FILE
+    echo "doom-launcher: $*" >> "$LOG_FILE"
 }
 
 log "Starting Doom launcher..."
@@ -29,6 +31,10 @@ fi
 
 mkdir -p "$DOOM_DIR" 2>/dev/null
 
+# Rotate old log so each session is fresh
+> "$LOG_FILE"
+log "=== Doom session started ==="
+
 # Look for WAD file (case insensitive search)
 WAD_FILE=""
 for w in "$DOOM_DIR/DOOM1.WAD" "$DOOM_DIR/doom1.wad" "$DOOM_DIR/DOOM.WAD" "$DOOM_DIR/doom.wad"; do
@@ -39,8 +45,7 @@ for w in "$DOOM_DIR/DOOM1.WAD" "$DOOM_DIR/doom1.wad" "$DOOM_DIR/DOOM.WAD" "$DOOM
 done
 
 if [ -z "$WAD_FILE" ]; then
-    log "ERROR: No WAD file found! Please put DOOM1.WAD in SD card folder /doom/"
-    # Show error log to console
+    log "ERROR: No WAD file found in $DOOM_DIR"
     echo "Copy DOOM1.WAD to SD card folder /doom/" > /dev/console
     sleep 5
     exit 1
@@ -48,14 +53,17 @@ fi
 
 log "Found WAD: $WAD_FILE"
 
-# Determine path to doom executable
+# Determine path to doom executable (MicroSD binary > /usr/data/doom > /usr/bin/doom)
 DOOM_BIN=/usr/bin/doom
-[ -x /usr/data/doom ] && DOOM_BIN=/usr/data/doom
+[ -x /usr/data/doom ]    && DOOM_BIN=/usr/data/doom
+[ -x "$DOOM_DIR/doom" ]  && DOOM_BIN="$DOOM_DIR/doom"
 
+log "Binary: $DOOM_BIN"
 cd "$DOOM_DIR"
-log "Executing $DOOM_BIN -iwad $WAD_FILE"
-"$DOOM_BIN" -iwad "$WAD_FILE" >> $LOG_FILE 2>&1
 
-log "Doom exited. Restarting player..."
+# Run doom – all stdout/stderr (including [doom-input] lines) goes to SD card log
+"$DOOM_BIN" -iwad "$WAD_FILE" >> "$LOG_FILE" 2>&1
+
+log "Doom exited."
 sleep 1
 reboot

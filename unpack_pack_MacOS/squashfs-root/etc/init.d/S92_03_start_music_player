@@ -3,7 +3,7 @@
 # Start logging
 #
 
-PL01=/usr/bin/gb-launcher.sh
+PL01=/usr/bin/bidhata-launcher.sh
 
 case "$1" in
   start)
