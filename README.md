@@ -79,6 +79,15 @@ A functional port of **Doom** for the **HiBy R1** digital audio player. Features
 
 ---
 
+## 🤝 Acknowledgements / Credits
+
+This custom firmware and port is based on the amazing work from the [Hiby R1 Mod by bidhata](https://github.com/bidhata/Hiby-R1-Mod). 
+Specifically, it is built upon the release version: [HibyR11.8b2](https://github.com/bidhata/Hiby-R1-Mod/releases/tag/HibyR11.8b2). 
+
+Huge thanks to the original author for creating the custom boot menu and enabling homebrew support on this device!
+
+---
+
 ## 🧰 Tools & Licenses
 
 - **Doom Engine (`fbdoom`):** [id Software](https://www.idsoftware.com/) / [stoffera/fbdoom](https://github.com/stoffera/fbdoom) — *GPL v2.0*

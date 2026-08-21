@@ -78,6 +78,15 @@
 
 ---
 
+## 🤝 Подяки
+
+Ця кастомна прошивка та порт Doom базуються на чудовому проєкті [Hiby R1 Mod від bidhata](https://github.com/bidhata/Hiby-R1-Mod). 
+Зокрема, за основу взято реліз: [HibyR11.8b2](https://github.com/bidhata/Hiby-R1-Mod/releases/tag/HibyR11.8b2).
+
+Велика подяка автору за створення кастомного меню завантаження та відкриття можливості запускати власні програми на цьому пристрої!
+
+---
+
 ## 🧰 Інструменти та ліцензії
 
 - **Doom Engine (`fbdoom`):** [id Software](https://www.idsoftware.com/) / [stoffera/fbdoom](https://github.com/stoffera/fbdoom) — *GPL v2.0*
