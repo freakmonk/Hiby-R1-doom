@@ -1,0 +1,39 @@
+# Bidhata Menu configuration.
+# One line per menu row:  LABEL|COLOR|ACTION|PARAM|CONFIRM_TEXT|GROUP
+#
+#   LABEL        Row text shown on screen.
+#   COLOR        Palette name (PLAYER, SHUTDOWN, FW_UPDATE, DANGER, STRIP, TEXT)
+#                or a raw 0xRRGGBB. See include/menu_config.h Palette.
+#   ACTION       run | exec | submenu | shutdown | fw_update | factory_reset
+#                run  with PARAM=player  -> exit to music player (sentinel)
+#                run  with PARAM=<path>  -> launch another binary
+#                exec with PARAM=<shell> -> run shell command, return to menu
+#                submenu             -> open GROUP named in PARAM
+#   PARAM        See ACTION. For exec, the shell command to run.
+#   CONFIRM_TEXT Non-empty shows a Yes/Cancel gate. Empty skips it.
+#   GROUP        Empty = main screen. Non-empty = only inside the submenu
+#                of that name.
+#
+# HOW TO CUSTOMIZE:
+#   1. Add a top-level item:   MY GAME|PLAYER|run|/usr/bin/my-game|
+#   2. Add a submenu:          MY TOOLS|STRIP|submenu|MYTOOLS|
+#      then rows in it:        MY ITEM|STRIP|exec|my_cmd||MYTOOLS
+#   3. Disable compress tools: delete or comment (#) the two COMPRESS lines.
+#      Or set env  BIDHATA_COMPRESS=0  before flashing (patch flag --no-compress
+#      or BIDHATA_COMPRESS=0 env) to omit the binary and its menu rows.
+#   4. Push a customized file live (no reflash):  adb push my.conf /usr/data/bidhata-menu.conf
+#
+HIBY PLAYER|PLAYER|run|player|
+DOOM|STRIP|run|/usr/bin/doom-launcher.sh|
+UTILITIES|STRIP|submenu|UTILITIES|
+DANGER ZONE|DANGER|submenu|DANGER|
+SHUTDOWN|SHUTDOWN|shutdown||Power off the device.|UTILITIES
+FIRMWARE UPDATE (SD)|FW_UPDATE|fw_update||Reboots into the updater. Needs a .upt file|UTILITIES
+ENABLE ADB|FW_UPDATE|exec|adbon|Turns on ADB until reboot. USB stops acting as a card reader while it is on.|UTILITIES
+FACTORY RESET|DANGER|factory_reset||Erases ALL data on the device. Cannot be undone.|DANGER
+# --- Optional compress utilities (delete or comment to disable) ---
+# Requires compress_art binary (tools/compress-art). By default the patch
+# installs it and these rows; use  --no-compress  or  BIDHATA_COMPRESS=0
+# to omit both. Also removable by editing the config alone.
+COMPRESS FILE ART|STRIP|exec|compress_art_all.sh|Shrinks oversized embedded art on every FLAC/MP3 on SD to fit the screen.|UTILITIES
+COMPRESS ALBUM ART|STRIP|exec|compress_folder_art.sh -f|Shrinks oversized folder.jpg/cover.png etc. on SD to fit the screen.|UTILITIES
