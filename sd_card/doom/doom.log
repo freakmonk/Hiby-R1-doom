@@ -1,0 +1,159 @@
+
+Starting Doom on HiBy R1...
+[doom-input] opened 4 /dev/input/event* nodes
+                            DOOM Shareware Startup v1.9                           
+V_Init: allocate screens.
+M_LoadDefaults: Load system defaults.
+Z_Init: Init zone memory allocation daemon. 
+W_Init: Init WADfiles.
+ adding ./doom1.wad
+===========================================================================
+                                Shareware!
+===========================================================================
+M_Init: Init miscellaneous info.
+R_Init: Init DOOM refresh daemon - [                   ]
+InitTextures
+InitFlats........
+InitSprites
+InitColormaps
+R_InitData
+R_InitPointToAngle
+R_InitTables
+R_InitPlanes
+R_InitLightTables
+R_InitSkyMap
+R_InitTranslationsTables
+P_Init: Init Playloop state.
+I_Init: Setting up machine state.
+D_CheckNetGame: Checking network game status.
+startskill 2  deathmatch: 0  startmap: 1  startepisode: 1
+player 1 of 1 (1 nodes)
+S_Init: Setting up sound.
+S_Init: default sfx volume 8
+HU_Init: Setting up heads up display.
+ST_Init: Init status bar.
+HiBy R1 Framebuffer initialized: 480x800 @ 16bpp
+[doom-input] EV_KEY code=114 val=1
+[doom-input] DOWN → 1
+[doom-input] EV_KEY code=114 val=0
+[doom-input] DOWN → 0
+[doom-input] EV_KEY code=114 val=1
+[doom-input] DOWN → 1
+[doom-input] EV_KEY code=114 val=0
+[doom-input] DOWN → 0
+[doom-input] EV_KEY code=164 val=1
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] EV_KEY code=164 val=0
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] EV_KEY code=164 val=1
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] EV_KEY code=164 val=0
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] EV_KEY code=163 val=1
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] EV_KEY code=163 val=0
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] EV_KEY code=163 val=1
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] EV_KEY code=163 val=0
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] EV_KEY code=164 val=1
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] EV_KEY code=164 val=0
+[doom-input] EV_KEY code=164 val=1
+[doom-input] EV_KEY code=164 val=0
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] EV_KEY code=115 val=1
+[doom-input] UP → 1
+[doom-input] EV_KEY code=115 val=0
+[doom-input] UP → 0
+[doom-input] EV_KEY code=115 val=1
+[doom-input] UP → 1
+[doom-input] EV_KEY code=115 val=0
+[doom-input] UP → 0
+[doom-input] EV_KEY code=115 val=1
+[doom-input] UP → 1
+[doom-input] EV_KEY code=115 val=0
+[doom-input] UP → 0
+[doom-input] EV_KEY code=164 val=1
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] EV_KEY code=116 val=1
+[doom-input] ESC → 1
+[doom-input] EV_KEY code=116 val=0
+[doom-input] ESC → 0
+[doom-input] EV_KEY code=116 val=1
+[doom-input] ESC → 1
+[doom-input] EV_KEY code=116 val=0
+[doom-input] ESC → 0
+[doom-input] EV_KEY code=164 val=0
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] DOWN → 1
+[doom-input] DOWN → 0
+[doom-input] UP → 1
+[doom-input] UP → 0
+[doom-input] DOWN → 1
+[doom-input] DOWN → 0
+[doom-input] DOWN → 1
+[doom-input] DOWN → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] ESC → 1
+[doom-input] ESC → 0
+[doom-input] ESC → 1
+[doom-input] ESC → 0
+[doom-input] UP → 1
+[doom-input] UP → 0
+[doom-input] UP → 1
+[doom-input] UP → 0
+[doom-input] UP → 1
+[doom-input] UP → 0
+[doom-input] UP → 1
+[doom-input] UP → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] USE→DOWN(menu) → 1
+[doom-input] USE→DOWN(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] FIRE→ENTER(menu) → 1
+[doom-input] FIRE→ENTER(menu) → 0
+[doom-input] ESC → 1
+[doom-input] ESC → 0
+[doom-input] ESC → 1
+[doom-input] ESC → 0
+[doom-input] EV_KEY code=116 val=1
+[doom-input] ESC → 1
+[doom-input] EV_KEY code=116 val=0
+[doom-input] ESC → 0
