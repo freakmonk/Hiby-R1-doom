@@ -38,6 +38,8 @@ enum {
     IDX_WEAPON,
     IDX_ESCAPE,
     IDX_TAB,
+    IDX_Y,
+    IDX_N,
     IDX_COUNT
 };
 
@@ -52,7 +54,9 @@ static const int btn_doom_key[IDX_COUNT] = {
     [IDX_RUN]    = KEY_RSHIFT,
     [IDX_WEAPON] = '2',
     [IDX_ESCAPE] = KEY_ESCAPE,
-    [IDX_TAB]    = KEY_TAB
+    [IDX_TAB]    = KEY_TAB,
+    [IDX_Y]      = 'y',
+    [IDX_N]      = 'n'
 };
 
 static bool hw_held[IDX_COUNT];
@@ -135,9 +139,15 @@ static void update_touch_held(void)
 
     /* Action buttons (right side) */
     if (x < 360 && y < 560)  touch_held[IDX_WEAPON] = true;
-    if (x < 360 && y >= 560) touch_held[IDX_FIRE]   = true;
+    if (x < 360 && y >= 560 && y < 670) touch_held[IDX_FIRE]   = true;
     if (x >= 360 && y < 570) touch_held[IDX_USE]    = true;
-    if (x >= 360 && y >= 570) touch_held[IDX_RUN]   = true;
+    if (x >= 360 && y >= 570 && y < 670) touch_held[IDX_RUN]   = true;
+
+    /* Y and N buttons under the action buttons */
+    if (y >= 670 && y < 750) {
+        if (x >= 250 && x < 360) touch_held[IDX_Y] = true;
+        if (x >= 360) touch_held[IDX_N] = true;
+    }
 }
 
 /* ------------------------------------------------------------------ */
@@ -178,6 +188,7 @@ void I_StartTic(void)
                 continue;
             }
 
+            /* ── keyboard / buttons ──────────────────────────── */
             if (ev.type != EV_KEY) continue;
 
             int pressed = (ev.value != 0);  /* 0=up 1=down 2=repeat */
@@ -192,13 +203,23 @@ void I_StartTic(void)
 
             /* ── hardware key table (exact HiBy R1 scan codes) ── */
             debug_last_code = ev.code;
-            debug_last_val  = ev.value;
+            debug_last_val = ev.value;
 
-            printf("[doom-input] EV_KEY code=%d val=%d\n", ev.code, ev.value);
+            extern int global_audio_volume;
 
             switch (ev.code) {
-                case KEY_VOLUMEUP:   hw_held[IDX_UP]     = pressed; break;
-                case KEY_VOLUMEDOWN: hw_held[IDX_DOWN]   = pressed; break;
+                case KEY_VOLUMEUP:   
+                    if (pressed) {
+                        global_audio_volume += 10;
+                        if (global_audio_volume > 100) global_audio_volume = 100;
+                    }
+                    break;
+                case KEY_VOLUMEDOWN:
+                    if (pressed) {
+                        global_audio_volume -= 10;
+                        if (global_audio_volume < 0) global_audio_volume = 0;
+                    }
+                    break;
                 case KEY_PLAYPAUSE:  hw_held[IDX_FIRE]   = pressed; break;
                 case KEY_NEXTSONG:   hw_held[IDX_USE]    = pressed; break;
                 case KEY_POWER:      hw_held[IDX_ESCAPE] = pressed; break;
@@ -207,11 +228,15 @@ void I_StartTic(void)
                 case KEY_DOWN:       hw_held[IDX_DOWN]   = pressed; break;
                 case KEY_LEFT:       hw_held[IDX_LEFT]   = pressed; break;
                 case KEY_RIGHT:      hw_held[IDX_RIGHT]  = pressed; break;
-                case KEY_ENTER:      hw_held[IDX_FIRE]   = pressed; break;
+                case KEY_RIGHTCTRL:  
+                case KEY_LEFTCTRL:   hw_held[IDX_FIRE]   = pressed; break;
                 case KEY_SPACE:      hw_held[IDX_USE]    = pressed; break;
-                case KEY_RSHIFT:     hw_held[IDX_RUN]    = pressed; break;
-                case KEY_TAB:        hw_held[IDX_TAB]    = pressed; break;
+                case KEY_RIGHTSHIFT:
+                case KEY_LEFTSHIFT:  hw_held[IDX_RUN]    = pressed; break;
+                case 2: // KEY_1 on some boards?
+                case KEY_2:          hw_held[IDX_WEAPON] = pressed; break;
                 case KEY_ESC:        hw_held[IDX_ESCAPE] = pressed; break;
+                case KEY_TAB:        hw_held[IDX_TAB]    = pressed; break;
                 default: break;
             }
         }
@@ -310,6 +335,16 @@ void I_StartTic(void)
             case IDX_TAB:
                 post_doom_key(KEY_TAB, is_down);
                 gamekeydown[KEY_TAB] = is_down;
+                break;
+
+            case IDX_Y:
+                post_doom_key('y', is_down);
+                gamekeydown['y'] = is_down;
+                break;
+
+            case IDX_N:
+                post_doom_key('n', is_down);
+                gamekeydown['n'] = is_down;
                 break;
 
             default: break;

@@ -21,13 +21,17 @@ fi
 
 # 1. Compile Doom binary for MIPS32r2
 echo "🔨 Compiling Doom for MIPS32r2..."
-cd "$BUILD_DIR/fbdoom_src"
-make CROSS_COMPILE=mipsel-linux-gnu- clean all
+# We compile dynamically now, but using the Ingenic GCC 5.2 (glibc 2.22) container 
+# so it links against the correct libc on the HiBy R1 device.
+docker run --rm -v "$BUILD_DIR/fbdoom_src:/src" -w /src \
+    hiby-mplayer-builder \
+    make CROSS_COMPILE=mips-linux-gnu- clean all
 
 # 2. Compile Bidhata Boot Menu for MIPS32r2
 echo "🔨 Compiling Bidhata Boot Menu for MIPS32r2..."
-cd "$BUILD_DIR/Hiby-R1-Mod/bidhata-menu"
-make CROSS=mipsel-linux-gnu- STATIC=1 clean all
+docker run --rm -v "$BUILD_DIR/Hiby-R1-Mod/bidhata-menu:/src" -w /src \
+    hiby-mplayer-builder \
+    make CROSS=mips-linux-gnu- STATIC=1 clean all
 
 cp "$BUILD_DIR/Hiby-R1-Mod/bidhata-menu/bidhata-menu" "$BUILD_DIR/Hiby-R1-Mod/bidhata-menu/patch/payload/bidhata-menu"
 cp "$BUILD_DIR/Hiby-R1-Mod/bidhata-menu/scripts/bidhata-launcher.sh" "$BUILD_DIR/Hiby-R1-Mod/bidhata-menu/patch/payload/bidhata-launcher.sh"

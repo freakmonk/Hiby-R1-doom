@@ -94,6 +94,8 @@ static const uint8_t font8x8[128][8] = {
 };
 
 void I_InitGraphics(void) {
+    if (fbfd >= 0) return; // Already initialized
+
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd < 0) {
         perror("Error: cannot open /dev/fb0");
@@ -153,7 +155,7 @@ static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
     return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 }
 
-static void draw_rect(int rx, int ry, int rw, int rh, uint8_t r, uint8_t g, uint8_t b) {
+void draw_rect(int rx, int ry, int rw, int rh, uint8_t r, uint8_t g, uint8_t b) {
     if (rx < 0 || ry < 0 || rx + rw > hiby_fb_width || ry + rh > hiby_fb_height) return;
     uint16_t c16 = rgb565(r, g, b);
     uint32_t c32 = (r << 16) | (g << 8) | b;
@@ -170,7 +172,7 @@ static void draw_rect(int rx, int ry, int rw, int rh, uint8_t r, uint8_t g, uint
     }
 }
 
-static void draw_char8x8(int x, int y, char c, uint8_t r, uint8_t g, uint8_t b) {
+void draw_char8x8(int x, int y, char c, uint8_t r, uint8_t g, uint8_t b) {
     uint8_t uc = (uint8_t)c;
     if (uc >= 128) return;
     uint16_t c16 = rgb565(r, g, b);
@@ -198,7 +200,7 @@ static void draw_char8x8(int x, int y, char c, uint8_t r, uint8_t g, uint8_t b) 
     }
 }
 
-static void draw_str(int x, int y, const char *str, uint8_t r, uint8_t g, uint8_t b) {
+void draw_str(int x, int y, const char *str, uint8_t r, uint8_t g, uint8_t b) {
     int cx = x;
     while (*str) {
         draw_char8x8(cx, y, *str, r, g, b);
@@ -219,6 +221,12 @@ static void draw_touch_hud(void) {
     draw_rect(370, 480, 90, 80, 40, 180, 40);  // USE (Green)
     draw_rect(370, 580, 90, 80, 40, 100, 200); // RUN (Blue)
     draw_rect(260, 480, 90, 70, 180, 180, 40); // WEAPON (Yellow)
+
+    // Y/N Confirm buttons
+    draw_rect(260, 680, 90, 60, 120, 160, 120); // Y (Light Greenish)
+    draw_rect(370, 680, 90, 60, 160, 120, 120); // N (Light Reddish)
+    draw_str(295, 705, "Y", 255, 255, 255);
+    draw_str(405, 705, "N", 255, 255, 255);
 
     // TOP MENU BAR
     draw_rect(10, 370, 100, 50, 100, 100, 100);  // MENU (ESC)
@@ -274,7 +282,7 @@ void I_FinishUpdate(void) {
     draw_touch_hud();
 
     // Render live real-time debug info status bar at the bottom
-    draw_live_debug_bar();
+    // draw_live_debug_bar();
 }
 
 void I_ReadScreen(byte* scr) {

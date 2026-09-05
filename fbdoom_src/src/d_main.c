@@ -613,10 +613,10 @@ void IdentifyVersion (void)
     doom2fwad = malloc(strlen(doomwaddir)+1+10+1);
     sprintf(doom2fwad, "%s/doom2f.wad", doomwaddir);
 
-    home = getenv("HOME");
-    if (!home)
-      I_Error("Please set $HOME to your home directory");
-    sprintf(basedefault, "%s/Library/Application support/", home);
+    // home = getenv("HOME");
+    // if (!home)
+    //  I_Error("Please set $HOME to your home directory");
+    sprintf(basedefault, ".doomrc");
 #endif
 
     if (M_CheckParm ("-shdev"))
@@ -658,6 +658,22 @@ void IdentifyVersion (void)
 	D_AddFile (DEVMAPS"cdata/pnames.lmp");
 	strcpy (basedefault,DEVDATA"default.cfg");
 	return;
+    }
+
+    int p = M_CheckParm("-iwad");
+    if (p && p < myargc - 1) {
+        const char *iwad = myargv[p+1];
+        int len = strlen(iwad);
+        const char *base = iwad;
+        for (int i = len - 1; i >= 0; i--) {
+            if (iwad[i] == '/') { base = iwad + i + 1; break; }
+        }
+        if (!strcasecmp(base, "doom1.wad")) gamemode = shareware;
+        else if (!strcasecmp(base, "doom.wad")) gamemode = registered;
+        else if (!strcasecmp(base, "doomu.wad")) gamemode = retail;
+        else gamemode = commercial;
+        D_AddFile((char*)iwad);
+        return;
     }
 
     if ( !access (doom2fwad,R_OK) )
